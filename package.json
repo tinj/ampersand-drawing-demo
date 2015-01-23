@@ -19,5 +19,6 @@
   },
   "main": "canvas-view.js",
   "scripts": {
+    "build": "browserify entry.js > dist/drawing.js"
   }
 }

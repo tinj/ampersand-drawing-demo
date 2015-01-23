@@ -1,7 +1,7 @@
 var AmpersandCollection = require('ampersand-collection');
 var underscoreMixin     = require('ampersand-collection-underscore-mixin');
 var _                   = require('underscore');
-var log              = require('bows')('C:Points');
+var log                 = require('bows')('C:Points');
 
 module.exports = AmpersandCollection.extend(underscoreMixin, {
 
