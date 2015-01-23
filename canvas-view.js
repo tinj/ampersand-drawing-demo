@@ -1,17 +1,17 @@
 var AmpersandView   = require('ampersand-view');
 var Offset          = require('./helpers/offset');
 var raf             = require('raf');
-// var log             = require('bows')('V:Canvas');
+var log             = require('bows')('V:Canvas');
 
-module.exports = AmpersandView.extend(Offset, raf, {
+module.exports = AmpersandView.extend(Offset, {
 
     template: '<canvas dragable="false">',
 
     bindings: {
-        // 'canvasStyle': {
-        //     name: 'style',
-        //     type: 'attribute'
-        // },
+        'canvasStyle': {
+            name: 'style',
+            type: 'attribute'
+        },
         'model.height': {
             name: 'height',
             type: 'attribute'
@@ -22,19 +22,15 @@ module.exports = AmpersandView.extend(Offset, raf, {
         }
     },
 
-    // derived: {
-    //     canvasStyle: {
-    //         deps: ['model.topOffset', 'model.leftOffset'],
-    //         fn: function () {
-    //             var style = '';
-    //             if (this.model.topOffset)
-    //                 style += 'top:' + this.model.topOffset + 'px;';
-    //             if (this.model.leftOffset)
-    //                 style += 'left:' + (this.model.leftOffset) + 'px;';
-    //             return style;
-    //         }
-    //     }
-    // },
+    derived: {
+        canvasStyle: {
+            deps: ['model.backgroundColor'],
+            fn: function () {
+                var style = 'background:' + this.model.backgroundColor + ';';
+                return style;
+            }
+        }
+    },
 
     session: {
         _drawPending: ['boolean', true, false],
@@ -45,12 +41,13 @@ module.exports = AmpersandView.extend(Offset, raf, {
     },
 
     initialize: function () {
-        // log('initializing');
+        log('initializing');
         this.on('change:model.lastPoint', this.draw);
+        this.render();
     },
 
     render: function () {
-        this.renderWithTemplate(this);
+        // this.renderWithTemplate(this);
         this.drawCanvas = this.drawCanvas.bind(this);
         var ctx = this.ctx = this.el.getContext('2d');
         ctx.lineCap = this.model.lineCap;
@@ -81,12 +78,12 @@ module.exports = AmpersandView.extend(Offset, raf, {
 
         ctx.beginPath();
 
-        points.forEach(function (pts, i) {
+        points.forEach(function (pt, i) {
             if (i === 0) {
                 // Start at the first point
-                ctx.moveTo.apply(ctx, pts);
+                ctx.moveTo(pt.x, pt.y);
             } else {
-                ctx.lineTo.apply(ctx, pts);
+                ctx.lineTo(pt.x, pt.y);
             }
         });
 
@@ -104,10 +101,12 @@ module.exports = AmpersandView.extend(Offset, raf, {
 
     addPoint: function (ev) {
         var pt = this._getEventPosition(ev);
+        // log(pt);
         this.model.addPoint(pt);
     },
 
     startDraw: function (ev) {
+        // log('startDraw');
         if (ev) ev.preventDefault();
         this.drawing = true;
         this.set(this.getElOffset());
